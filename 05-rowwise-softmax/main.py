@@ -21,15 +21,15 @@ def python_softmax(a, b):
             b[i,j] /= s   
 
 for M in [1024*100]:
-    N = 2048-1
+    N = 2047
     print(f'M: {M}, N: {N}')
     a = torch.randn(M, N, device='cuda', dtype=torch.float32)
 
-    for f in [torch_softmax, triton_softmax]:
+    for f in [torch_softmax, triton_softmax, cuda_softmax]:
         b = torch.empty(M, N, device='cuda', dtype=torch.float32)
         f(a, b)
-        # print(b)
-        # print(torch.sum(a, dim=-1))
+        #print(b[0])
+        #print(torch.softmax(a, dim=-1)[0])
         assert(torch.allclose(b, torch.softmax(a, dim=-1), atol=1e-2))
         print('runtime:', bench(lambda: f(a, b)), 'ms')
     print()
