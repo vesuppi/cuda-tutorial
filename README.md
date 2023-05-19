@@ -5,8 +5,6 @@
 * 相邻的线程访问相邻的内存地址
 * 使用shared memory进行通信和缓存
 
-同时我们也会看到使用triton编程相对于cuda的简化。
-
 # 为什么要使用GPU？
 
 在过去的几十年中，CPU的性能一直在持续地提高，那我们为什么还需要GPU呢？等着过几年CPU的性能继续提高不就行了吗？
@@ -33,3 +31,45 @@ GPU的设计采用了另一种思路。很多的应用其实都是对大量的�
 以下图片来自于CUDA C编程指南（https://docs.nvidia.com/cuda/cuda-c-programming-guide/）：
 
 ![GPU](https://docs.nvidia.com/cuda/cuda-c-programming-guide/_images/gpu-devotes-more-transistors-to-data-processing.png)
+
+# 教程简介
+本教程一共6节，内容依次涵盖
+
+* 第一节：向量加法
+  * 感受GPU编程的思维
+* 第二节：矩阵按行求和
+  * 让相邻的线程访问相邻的内存地址来避免常见的性能问题
+  * 使用shared memory来进行线程之间的同步
+* 第三节：矩阵按行求和（继续）
+  * 使用warp shuffle来进行线程之间的同步
+* 第四节：矩阵全局求和
+  * 使用atomic操作来进行线程块之间的同步
+* 第五节：softmax
+  * 一个既有element-wise也有reduction操作的例子
+* 第六节：矩阵乘法
+  * 使用triton来简化分块的矩阵乘法编程
+
+另外传统的CUDA编程教程基于C++，而本教程的driver程序使用Python编写，方便数据创建以及性能测试等等，只有CUDA kernel本身使用CUDA C++，这样旨在简化周边代码而更多关注GPU编程的本质（并行算法设计）。每一个例子除了CUDA的版本我们也编写了一个triton的版本，这使得读者可以看到两者的区别，以及各自的pros and cons。譬如CUDA的适用性更广，对每个线程有更精确的控制，而triton则对于特定类型的程序写起来更快，简化了编程。这样的对比也帮助读者思考，我们到底使用什么样的方式对GPU进行编程？到底如何兼顾性能、广泛性和生产力？我们希望我们的GPU编程语言能够表达许多场景的程序，也希望它足以发挥出硬件的性能，同时我们也不希望编程过于繁琐。
+
+本教材有如下库依赖：
+
+```bash
+pip install torch cupy triton
+```
+
+- `torch`用来管理数据的创建和性能测试
+- `cupy`使用简化CUDA kernel的编译和调用
+- `triton`用来编写triton kernel
+
+# 扩展阅读
+本教材的目的仅仅是让读者对GPU计算有一个初步的了解，我们使用简单的矩阵计算为例，借此希望能让读者感受GPU计算的魅力，但GPU不仅仅是可以用来加速深度学习，它还有各种各样其他的应用场景，事实上我们也希望读者能够去思考如何为自己领域的某个算法设计一个GPU并行的版本。
+
+对于需要了解更深入的CUDA编程特性，以及如何用GPU来解决更多的问题（譬如排序），我们我们推荐下面的阅读和教程：
+* [Intro to Parallel Programming](https://www.youtube.com/watch?v=F620ommtjqk&list=PLAwxTw4SYaPnFKojVQrmyOGFCqHTxfdv2&ab_channel=Udacity)
+  * 主要讨论GPU算法，包括排序等
+  * 除了教程本身，里面的人物也很棒
+* [CUDA Training Series](https://www.olcf.ornl.gov/cuda-training-series/)
+  * 我看过最好的CUDA入门教程，录像在每一个章节的页面里
+  * 前面的三章比较基本，后面是更加深入的内容
+* [ETH:Hands-on Acceleration on Heterogeneous Computing Systems](https://safari.ethz.ch/projects_and_seminars/spring2022/doku.php?id=heterogeneous_systems)
+  * 这个更加学术一点，譬如它会告诉你SIMT的本质是用户编写SPMD、而机器动态进行SIMD，以及GPU使用fine-grain multi-threading来hide latency等
