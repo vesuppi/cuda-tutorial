@@ -13,9 +13,7 @@ void kernel(float* a, float* b, int M, int N) {
     int laneId = threadIdx.x % 32;
     int warpId = threadIdx.x / 32;
     for (int step = 32/2; step > 0; step = step / 2) {
-        //if (laneId < step) {
-            sum += __shfl_down_sync(FULL_MASK, sum, step);
-        //}
+        sum += __shfl_down_sync(FULL_MASK, sum, step);
     }
 
     // Aggregate across warps
@@ -37,9 +35,7 @@ void kernel(float* a, float* b, int M, int N) {
         }
         
         for (int step = 32/2; step > 0; step = step / 2) {
-            //if (laneId < step) {
-                sum += __shfl_down_sync(FULL_MASK, sum, step);
-            //}
+            sum += __shfl_down_sync(FULL_MASK, sum, step);
         }
 
         if (laneId == 0) {

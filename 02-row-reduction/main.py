@@ -15,10 +15,10 @@ def python_sum_row(a, b):
 for M in [1024*100, 1024*1024]:
     N = 2048-1
     print(f'M: {M}, N: {N}')
-    a = torch.ones(M, N, device='cuda', dtype=torch.float32)
+    a = torch.randn(M, N, device='cuda', dtype=torch.float32)
 
     for f in [torch_sum_row, cuda_sum_row, triton_sum_row]:
-        b = torch.zeros(M, device='cuda', dtype=torch.float32)
+        b = torch.empty(M, device='cuda', dtype=torch.float32)
         f(a, b)
         # print(b)
         # print(torch.sum(a, dim=-1))
