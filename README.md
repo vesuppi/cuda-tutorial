@@ -1,9 +1,36 @@
-一个简明的GPU编程入门教程，主要使用三个例子：向量加法、求和以及softmax。每个例子除了CUDA版本以外，也同时有一个[triton](https://triton-lang.org/main/index.html)的版本。
-希望用这三个例子来阐明GPU编程的三个要点：
+# 简介
+一个简明的GPU编程入门教程，主要使用三个例子：向量加法、求和以及softmax。每个例子除了CUDA版本以外，也同时有一个[triton](https://triton-lang.org/main/index.html)的版本。本教程一共6节，内容依次涵盖
 
-* 对问题的并行拆解
-* 相邻的线程访问相邻的内存地址
-* 使用shared memory进行通信和缓存
+* 第一节：向量加法
+  * 感受GPU编程的思维
+* 第二节：矩阵按行求和
+  * 让相邻的线程访问相邻的内存地址来避免常见的性能问题
+  * 使用shared memory来进行线程之间的同步
+* 第三节：矩阵按行求和（继续）
+  * 使用warp shuffle来进行warp线程之间的同步
+* 第四节：矩阵全局求和
+  * 使用atomic操作来进行线程块之间的同步
+* 第五节：softmax
+  * 一个既有element-wise也有reduction操作的例子
+  * 使用shared memory作为缓存
+* 第六节：矩阵乘法
+  * 使用triton来简化分块的矩阵乘法编程
+
+本教材有如下库依赖：
+
+```bash
+pip install torch cupy triton
+```
+
+- `torch`用来管理数据的创建和性能测试
+- `cupy`使用简化CUDA kernel的编译和调用
+- `triton`用来编写triton kernel
+
+运行一个章节的例子：先进入根目录，然后
+```bash
+python 01-vector-add/main.py
+```
+
 
 # 为什么要使用GPU？
 
@@ -41,25 +68,22 @@ GPU的设计采用了另一种思路。很多的应用其实都是对大量的�
   * 让相邻的线程访问相邻的内存地址来避免常见的性能问题
   * 使用shared memory来进行线程之间的同步
 * 第三节：矩阵按行求和（继续）
-  * 使用warp shuffle来进行线程之间的同步
+  * 使用warp shuffle来进行warp线程之间的同步
 * 第四节：矩阵全局求和
   * 使用atomic操作来进行线程块之间的同步
 * 第五节：softmax
   * 一个既有element-wise也有reduction操作的例子
+  * 使用shared memory作为缓存
 * 第六节：矩阵乘法
   * 使用triton来简化分块的矩阵乘法编程
 
+希望用这三个例子来阐明GPU编程的几个要点：
+
+* 对问题的并行拆解
+* 相邻的线程访问相邻的内存地址
+* 使用shared memory进行通信和缓存
+
 另外传统的CUDA编程教程基于C++，而本教程的driver程序使用Python编写，方便数据创建以及性能测试等等，只有CUDA kernel本身使用CUDA C++，这样旨在简化周边代码而更多关注GPU编程的本质（并行算法设计）。每一个例子除了CUDA的版本我们也编写了一个[triton](https://triton-lang.org/main/index.html)的版本，这使得读者可以看到两者的区别，以及各自的pros and cons。譬如CUDA的适用性更广，对每个线程有更精确的控制，而triton则对于特定类型的程序写起来更快，简化了编程。这样的对比也帮助读者思考，我们到底使用什么样的方式对GPU进行编程？到底如何兼顾性能、广泛性和生产力？我们希望我们的GPU编程语言能够表达许多场景的程序，也希望它足以发挥出硬件的性能，同时我们也不希望编程过于繁琐。
-
-本教材有如下库依赖：
-
-```bash
-pip install torch cupy triton
-```
-
-- `torch`用来管理数据的创建和性能测试
-- `cupy`使用简化CUDA kernel的编译和调用
-- `triton`用来编写triton kernel
 
 # 扩展阅读
 本教材的目的仅仅是让读者对GPU计算有一个初步的了解，我们使用简单的矩阵计算为例，借此希望能让读者感受GPU计算的魅力，但GPU不仅仅是可以用来加速深度学习，它还有各种各样其他的应用场景，事实上我们也希望读者能够去思考如何为自己领域的某个算法设计一个GPU并行的版本。
