@@ -1,6 +1,3 @@
-import os,sys
-#sys.path.append('.')
-print(sys.path)
 import torch
 import cupy as cp
 from utils import bench

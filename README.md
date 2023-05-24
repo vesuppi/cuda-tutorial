@@ -16,21 +16,22 @@
 * 第六节：矩阵乘法
   * 使用triton来简化分块的矩阵乘法编程
 
-本教材有如下库依赖：
-
+# 运行
+先安装好环境：
 ```bash
-pip install torch cupy triton
+python setup.py develop
 ```
 
-- `torch`用来管理数据的创建和性能测试
-- `cupy`使用简化CUDA kernel的编译和调用
-- `triton`用来编写triton kernel
-
-运行一个章节的例子：先进入根目录，然后
+然后运行一个章节的例子：
 ```bash
 python 01-vector-add/main.py
 ```
 
+库依赖清单（运行`python setup.py develop`时会自动安装）：
+
+- `torch`用来管理数据的创建和性能测试
+- `cupy`使用简化CUDA kernel的编译和调用
+- `triton`用来编写triton kernel
 
 # 为什么要使用GPU？
 
