@@ -5,12 +5,15 @@
 #define TM BM/16
 #define TN BN/16
 
+#define DX 16
+#define DY 16
+
 extern "C" __global__
 void kernel(float* a, float* b, float* c, int M, int N, int K) {
     int tx = threadIdx.x;
     int ty = threadIdx.y;
-    int dx = blockDim.x;
-    int dy = blockDim.y;
+    //int dx = blockDim.x;
+    //int dy = blockDim.y;
     int m = blockIdx.y * BM;   // starting index of the block
     int n = blockIdx.x * BN;   
     int _m, _n, _k;  // inner dimensions
@@ -34,14 +37,14 @@ void kernel(float* a, float* b, float* c, int M, int N, int K) {
     // Load first chunk of data (k=0)
     _m = ty;  
     _k = tx; 
-    for (int i = 0; i < TM; i++) {
-        a_block0[_m+i*dy][_k] = a[(m+_m+i*dy)*K + k+_k];
+    for (i = 0; i < TM; i++) {
+        a_block0[_m+i*DY][_k] = a[(m+_m+i*DY)*K + k+_k];
     }
     
     _k = ty;
     _n = tx;
-    for (int j = 0; j < TN; j++) {
-        b_block0[_k][_n+j*dx] = b[(k+_k)*N + n +_n+j*dx];
+    for (j = 0; j < TN; j++) {
+        b_block0[_k][_n+j*DX] = b[(k+_k)*N + n +_n+j*DX];
     }
     
     __syncthreads(); 
@@ -51,14 +54,14 @@ void kernel(float* a, float* b, float* c, int M, int N, int K) {
         // Load next chunk of data
         _m = ty;  
         _k = tx; 
-        for (int i = 0; i < TM; i++) {
-            a_block1[_m+i*dy][_k] = a[(m+_m+i*dy)*K + k+_k];
+        for (i = 0; i < TM; i++) {
+            a_block1[_m+i*DY][_k] = a[(m+_m+i*DY)*K + k+_k];
         }
         
         _k = ty;
         _n = tx;
-        for (int j = 0; j < TN; j++) {
-            b_block1[_k][_n+j*dx] = b[(k+_k)*N + n +_n+j*dx];
+        for (j = 0; j < TN; j++) {
+            b_block1[_k][_n+j*DX] = b[(k+_k)*N + n +_n+j*DX];
         }
         
         // __syncthreads();    // Note how this is not needed
@@ -68,11 +71,11 @@ void kernel(float* a, float* b, float* c, int M, int N, int K) {
         _n = tx;
         for (int _k = 0; _k < BK; _k++) {
             for (int i = 0; i < TM; i++) {
-                A[i] = a_block0[_m+dy*i][_k];
+                A[i] = a_block0[_m+DY*i][_k];
             }
 
             for (int j = 0; j < TN; j++) {
-                B[j] = b_block0[_k][_n+j*dx];
+                B[j] = b_block0[_k][_n+j*DX];
             }
 
             for (int i = 0; i < TM; i++) {
@@ -89,14 +92,14 @@ void kernel(float* a, float* b, float* c, int M, int N, int K) {
             // Load next chunk of data
             _m = ty;  
             _k = tx; 
-            for (int i = 0; i < TM; i++) {
-                a_block0[_m+i*dy][_k] = a[(m+_m+i*dy)*K + k+_k];
+            for (i = 0; i < TM; i++) {
+                a_block0[_m+i*DY][_k] = a[(m+_m+i*DY)*K + k+_k];
             }
             
             _k = ty;
             _n = tx;
-            for (int j = 0; j < TN; j++) {
-                b_block0[_k][_n+j*dx] = b[(k+_k)*N + n +_n+j*dx];
+            for (j = 0; j < TN; j++) {
+                b_block0[_k][_n+j*DX] = b[(k+_k)*N + n +_n+j*DX];
             }
 
         }
@@ -108,11 +111,11 @@ void kernel(float* a, float* b, float* c, int M, int N, int K) {
         _n = tx;
         for (int _k = 0; _k < BK; _k++) {
             for (int i = 0; i < TM; i++) {
-                A[i] = a_block1[_m+dy*i][_k];
+                A[i] = a_block1[_m+DY*i][_k];
             }
 
             for (int j = 0; j < TN; j++) {
-                B[j] = b_block1[_k][_n+j*dx];
+                B[j] = b_block1[_k][_n+j*DX];
             }
 
             for (int i = 0; i < TM; i++) {
@@ -129,7 +132,7 @@ void kernel(float* a, float* b, float* c, int M, int N, int K) {
     _n = tx;
     for (int i = 0; i < TM; i++) {
         for (int j = 0; j < TN; j++) {
-            c[(m+i*dy+_m)*N + n+_n+j*dx] = C[i][j];
+            c[(m+i*DY+_m)*N + n+_n+j*DX] = C[i][j];
         }
     }
 }

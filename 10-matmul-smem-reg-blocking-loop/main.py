@@ -1,5 +1,6 @@
 import os,sys
-sys.path.append('.')
+#sys.path.append('.')
+print(sys.path)
 import torch
 import cupy as cp
 from utils import bench
@@ -15,7 +16,7 @@ def python_matmul(a, b):
             for k in range(a.shape[1]):
                 c[i,j] += a[i,k] * b[k,j]
 
-for M, N, K in [(4096, 4096, 4096), (4096, 4096, 64)]:
+for M, N, K in [(4096, 4096, 4096), (4096, 4096, 64), (8192, 8192, 8192), (10240*4, 4096, 1024)]:
     print(f'M: {M}, N: {N}, K: {K}')
     a = torch.randn(M, K, device='cuda', dtype=torch.float32)
     b = torch.randn(K, N, device='cuda', dtype=torch.float32)
