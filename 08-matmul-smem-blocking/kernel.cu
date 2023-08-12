@@ -1,6 +1,6 @@
-#define BM 16
-#define BN 16
-#define BK 16
+#define BM 8
+#define BN 32
+#define BK 32
 
 extern "C" __global__
 void kernel(float* a, float* b, float* c, int M, int N, int K) {
@@ -15,14 +15,28 @@ void kernel(float* a, float* b, float* c, int M, int N, int K) {
 
     float sum = 0;
     for (int k = 0; k < K; k += BK) {
-        _m = ty;  
-        _k = tx;  
+        // Load a tile of A (BMxBK) to shared memory
+        // Note that thread block size is (BMxBN), the (BMxBK) data
+        // need to be mapped to the (BMxBN) threads. We'll make BK==BN
+        // to simplify the data loading
+        assert(BK == BN);
+        _m = ty;
+        _k = tx;
         a_block[_m][_k] = a[(m+_m)*K + k+_k];
 
-        _k = ty;
-        _n = tx;
-        b_block[_k][_n] = b[(k+_k)*N + n+_n];
+        // Load a tile of B (BKxBN) to shared memory
+        // We'll make BM<=BK to simplify data loading
+        assert(BM <= BK);
+        
+        for (int j = 0; j < BK; j+= BM) {
+            b_block[ty+j][tx] = b[(k+ty+j)*N + n+tx];
+        }
+        // _k = ty;
+        // _n = tx;
+        // b_block[_k][_n] = b[(k+_k)*N + n+_n];
 
+        // Sync threads to make sure all data is ready since
+        // a warp will need to use data loaded by other warps
         __syncthreads(); 
 
         _m = ty;
@@ -31,6 +45,8 @@ void kernel(float* a, float* b, float* c, int M, int N, int K) {
             sum += a_block[_m][_k] * b_block[_k][_n];
         } 
 
+        // Sync threads to make sure all warps have finished using the data
+        // before reusing a_block and b_block for the next tile
         __syncthreads();
     }
 

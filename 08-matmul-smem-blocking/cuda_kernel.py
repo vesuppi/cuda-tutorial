@@ -9,8 +9,9 @@ def kernel(a, b, c):
     _c = cp.asarray(c)
     M, K = a.shape
     K, N = b.shape
-    nthreads = (16, 16)
-    nblocks = (M//16, N//16)
+    BM, BN = 8, 32
+    nthreads = (BN, BM)
+    nblocks = (N//BN, M//BM)
     _kernel(
         nblocks, 
         nthreads, 

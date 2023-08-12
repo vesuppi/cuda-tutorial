@@ -12,7 +12,7 @@ def python_matmul(a, b):
             for k in range(a.shape[1]):
                 c[i,j] += a[i,k] * b[k,j]
 
-for M, N, K in [(4096, 4096, 4096), (4096, 4096, 64)]:
+for M, N, K in [(2048, 2048, 2048), (4096, 4096, 4096)]:
     print(f'M: {M}, N: {N}, K: {K}')
     a = torch.randn(M, K, device='cuda', dtype=torch.float32)
     b = torch.randn(K, N, device='cuda', dtype=torch.float32)
