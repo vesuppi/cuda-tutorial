@@ -14,12 +14,13 @@
   * 一个既有element-wise也有reduction操作的例子
   * 使用shared memory作为缓存
 * 第六节：矩阵乘法
+  * 内存访问优化的经典例子
   * 使用triton来简化分块的矩阵乘法编程
 
 # 运行
 先安装好环境：
 ```bash
-python setup.py develop
+pip install -e .
 ```
 
 然后运行一个章节的例子：
@@ -27,7 +28,7 @@ python setup.py develop
 python 01-vector-add/main.py
 ```
 
-库依赖清单（运行`python setup.py develop`时会自动安装）：
+库依赖清单（运行`pip install -e .`时会自动安装）：
 
 - `torch`用来管理数据的创建和性能测试
 - `cupy`使用简化CUDA kernel的编译和调用
@@ -90,12 +91,12 @@ GPU的设计采用了另一种思路。很多的应用其实都是对大量的�
 本教材的目的仅仅是让读者对GPU计算有一个初步的了解，我们使用简单的矩阵计算为例，借此希望能让读者感受GPU计算的魅力，但GPU不仅仅是可以用来加速深度学习，它还有各种各样其他的应用场景，事实上我们也希望读者能够去思考如何为自己领域的某个算法设计一个GPU并行的版本。
 
 对于需要了解更深入的CUDA编程特性，以及如何用GPU来解决更多的问题（譬如排序），我们我们推荐下面的阅读和教程：
-* [Intro to Parallel Programming](https://www.youtube.com/watch?v=F620ommtjqk&list=PLAwxTw4SYaPnFKojVQrmyOGFCqHTxfdv2&ab_channel=Udacity)
-  * 主要讨论GPU算法，包括排序等
-  * 除了教程本身，里面的人物也很棒
 * [CUDA Training Series](https://www.olcf.ornl.gov/cuda-training-series/)
   * 我看过最好的CUDA入门教程，录像在每一个章节的页面里
   * 前面的三章比较基本，后面是更加深入的内容
+* [Intro to Parallel Programming](https://www.youtube.com/watch?v=F620ommtjqk&list=PLAwxTw4SYaPnFKojVQrmyOGFCqHTxfdv2&ab_channel=Udacity)
+  * 主要讨论GPU算法，包括排序等
+  * 除了教程本身，里面的人物也很棒
 * [ETH:Hands-on Acceleration on Heterogeneous Computing Systems](https://safari.ethz.ch/projects_and_seminars/spring2022/doku.php?id=heterogeneous_systems)
   * 这个更加学术一点，譬如它会告诉你SIMT的本质是用户编写SPMD、而机器动态进行SIMD，以及GPU使用fine-grain multi-threading来hide latency等
 
@@ -103,3 +104,5 @@ GPU的设计采用了另一种思路。很多的应用其实都是对大量的�
 
 * https://developer.nvidia.com/cuda-example
 * https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html
+* https://docs.nvidia.com/cuda/pdf/CUDA_C_Best_Practices_Guide.pdf
+* https://docs.nvidia.com/cuda/parallel-thread-execution/index.html
