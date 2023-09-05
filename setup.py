@@ -5,6 +5,6 @@ setup(
     version='0.1',
     packages=[],
     install_requires=[
-          'torch', 'cupy', 'triton', 'pycuda'
+          'torch', 'cupy', 'triton',
       ],
 )
