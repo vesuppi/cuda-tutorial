@@ -16,6 +16,7 @@ for shape in [1024*100, 1024*1024, 1024*1024*10, 1024*1024*10-1]:
     print(f'N: {N}')
     a = torch.randn(N, device='cuda', dtype=torch.float32)
     b = torch.randn(N, device='cuda', dtype=torch.float32)
+
     
     for f in [torch_vec_add, cuda_vec_add, triton_vec_add]:
         c = torch.empty_like(a)
@@ -23,4 +24,7 @@ for shape in [1024*100, 1024*1024, 1024*1024*10, 1024*1024*10-1]:
         assert(torch.allclose(c, a+b))
         print('runtime:', bench(lambda: f(a, b, c)), 'ms')
     print()
+
+    _a, _b = a.cpu(), b.cpu()
+    print('cpu_version runtime:', bench(lambda: _a + _b), 'ms')
 
